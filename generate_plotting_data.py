@@ -4,20 +4,22 @@ from datetime import datetime
 from dotenv import load_dotenv
 from prediction import get_data
 from hybrid_score import hybrid_score
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Load environment variables
 load_dotenv()
 weather_api_key = os.getenv("WEATHER_API_KEY")
 
-# Load static city data
-with open('static/city_static_data.json', 'r') as f:
+STATIC_PATH = 'static/city_static_data.json'
+CACHE_PATH = 'plot_data_cache.json'
+FAILED_CITIES_PATH = 'failed_cities.json'
+
+with open(STATIC_PATH, 'r') as f:
     city_static_data = json.load(f)
 
-# Load old results if they exist
 existing_data = {}
-if os.path.exists("plot_data_cache.json"):
+if os.path.exists(CACHE_PATH):
     try:
-        with open("plot_data_cache.json", "r") as f:
+        with open(CACHE_PATH, 'r') as f:
             for entry in json.load(f):
                 existing_data[entry["city"]] = entry
     except Exception as e:
@@ -30,21 +32,12 @@ flood_prone_cities = {
     "Thiruvananthapuram", "Tirunelveli", "Imphal", "Dispur"
 }
 
-output = []
-failed_cities = []
-
-print("🌍 Generating updated plot data:\n")
-
-for city, static_info in city_static_data.items():
+def process_city(city, static_info):
     lat = static_info.get("latitude")
     lon = static_info.get("longitude")
-    
-    if not lat or not lon:
-        print(f"⚠️ Skipping {city} due to missing coordinates.")
-        failed_cities.append(city)
-        continue
 
-    print(f"▶ {city}: ", end="")
+    if not lat or not lon:
+        return None, city
 
     try:
         raw_vector = get_data(lat, lon, city)
@@ -68,26 +61,37 @@ for city, static_info in city_static_data.items():
             "cloud": cloud, "temp": temp, "elevation": elevation,
             "drainage": drainage, "soil_moisture": soil_moisture
         }
-
-        output.append(updated_entry)
-        print(f"✔ Success (Score: {score}, Label: {label})")
+        print(f"✔ {city}: Score={score}, Label={label}")
+        return updated_entry, None
 
     except Exception as e:
-        print(f"❌ Failed → {e}")
-        failed_cities.append(city)
-        if city in existing_data:
-            output.append(existing_data[city])  # Preserve old data
+        print(f"❌ {city}: Failed → {e}")
+        return existing_data.get(city), city
 
-# Write new JSON with each city's data in one line
-with open("plot_data_cache.json", "w") as f:
+print("🌍 Starting parallel data fetch for cities...\n")
+
+output = []
+failed_cities = []
+
+with ThreadPoolExecutor(max_workers=8) as executor:
+    futures = [executor.submit(process_city, city, static_info) for city, static_info in city_static_data.items()]
+    for future in as_completed(futures):
+        result, failed = future.result()
+        if result:
+            output.append(result)
+        if failed:
+            failed_cities.append(failed)
+
+# Write updated data
+with open(CACHE_PATH, "w") as f:
     f.write("[\n" + ",\n".join(json.dumps(entry) for entry in output) + "\n]")
 
 # Save failed cities
 if failed_cities:
-    with open("failed_cities.json", "w") as f:
+    with open(FAILED_CITIES_PATH, "w") as f:
         json.dump(failed_cities, f, indent=2)
 
-print("\n✅ Plotting complete.")
+print("\n✅ Parallel update complete.")
 if failed_cities:
     print("⚠️ The following cities failed and previous data was retained:")
     for city in failed_cities:
