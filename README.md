@@ -103,40 +103,20 @@ It also features natural language AI-generated summaries for decision-makers, an
 
 ---
 
-## 📈 Future Enhancements
-
-- 📱 Mobile app with real-time alerts via push/SMS
-- 🌍 GIS overlays using ESRI’s ArcGIS layers
-- 📦 Docker containerization for easy deployment
-- 🛰️ Satellite feed integration for live flood tracking
-
----
-
-## 📚 References
-
-- [Kaggle Flood Dataset](https://www.kaggle.com/datasets/s3programmer/flood-risk-in-india)
-- [WeatherAPI Docs](https://www.weatherapi.com/)
-- [NASA POWER Soil Data](https://power.larc.nasa.gov/)
-- [Together.ai LLM API](https://docs.together.ai/)
-- [XGBoost Paper (KDD 2016)](https://doi.org/10.1145/2939672.2939785)
-
----
-
 ## 👨‍💻 Author
 
 **Anand Prakash Gupta**  
 B.Tech, Computer and Communication Engineering  
 Manipal University Jaipur  
-👨‍🏫 Supervised by: Dr. Kusum Lata Jain
 
 ---
 
 ## 📬 Contact
 
 For queries, improvements, or collaborations:  
-📧 [your.email@example.com]  
-🌐 [LinkedIn](https://linkedin.com/in/your-profile)
+📧 [career.anandgupta@gmail.com]  
+🌐 [LinkedIn](https://www.linkedin.com/in/anand-prakash-gupta/)
 
 ---
 
-> 🌧️ Let's outsmart floods, one city at a time.
+
