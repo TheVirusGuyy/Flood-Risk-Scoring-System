@@ -49,6 +49,10 @@ def plot_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/plot_data_cache.json')
+def serve_plot_data():
+    # assumes plot_data_cache.json lives next to app.py
+    return send_from_directory(os.path.dirname(__file__), "plot_data_cache.json", mimetype="application/json")
 
 @app.route("/dashboard.html")
 def dashboard():
