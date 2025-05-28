@@ -11,8 +11,6 @@ together.api_key = TOGETHER_API_KEY
 if not TOGETHER_API_KEY:
     raise ValueError("TOGETHER_API_KEY not found in environment variables.")
 
-# Initialize Together client
-client = Together(api_key=TOGETHER_API_KEY)
 
 # Model to use (you can change this)
 MODEL_NAME = "meta-llama/Llama-3.2-3B-Instruct-Turbo"
