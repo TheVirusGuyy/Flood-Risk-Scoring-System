@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get API key from environment
+TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 together.api_key = TOGETHER_API_KEY
 if not TOGETHER_API_KEY:
     raise ValueError("TOGETHER_API_KEY not found in environment variables.")
