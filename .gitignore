@@ -13,8 +13,7 @@ env/
 # VSCode settings
 .vscode/
 
-# Data files
-*.csv
+
 
 
 # OS files
