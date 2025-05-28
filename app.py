@@ -8,6 +8,7 @@ from prediction import get_data
 from score import score_flood_risk  # ✅ Using rule-based scoring
 from llm_runner import generate_summary
 import markdown2
+import platform
 from datetime import datetime
 from hybrid_score import hybrid_score
 
@@ -190,38 +191,25 @@ def download_pdf():
     if not summary:
         return "No summary to generate PDF", 400
 
-    # Convert Markdown to HTML
     html_body = markdown2.markdown(summary)
-
-    # Timestamp for header
-    timestamp = datetime.now().strftime("%I:%M %p, %d %b %Y")
-
-
-    # Build final HTML for PDF
     rendered_html = render_template("pdf_template.html",
         region=city.upper() if city else "COUNTRY",
-        timestamp = datetime.now().strftime("%I:%M %p, %d %b %Y"),
+        timestamp=datetime.now().strftime("%I:%M %p, %d %b %Y"),
         html_body=html_body
     )
 
-    # Convert HTML to PDF (e.g. using pdfkit or weasyprint)
-    # Example using pdfkit:
-
-
-    import pdfkit
-    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
-
-    pdf = pdfkit.from_string(rendered_html, False,configuration=config)
+    if platform.system() == 'Windows':
+        import pdfkit
+        config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+        pdf = pdfkit.from_string(rendered_html, False, configuration=config)
+    else:
+        from weasyprint import HTML
+        pdf = HTML(string=rendered_html).write_pdf()
 
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'attachment; filename=flood_summary_{city}.pdf'
     return response
-
-@app.route('/plot_data_cache.json')
-def serve_plot_data():
-    # assumes plot_data_cache.json lives next to app.py
-    return send_from_directory(os.path.dirname(__file__), "plot_data_cache.json", mimetype="application/json")
 
 @app.route('/preview-pdf', methods=['POST'])
 def preview_pdf():
@@ -234,16 +222,18 @@ def preview_pdf():
     html_body = markdown2.markdown(summary)
     rendered_html = render_template("pdf_template.html",
         region=city.upper() if city else "COUNTRY",
-        timestamp = datetime.now().strftime("%I:%M %p, %d %b %Y"),
+        timestamp=datetime.now().strftime("%I:%M %p, %d %b %Y"),
         html_body=html_body
     )
 
-    import pdfkit
-    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+    if platform.system() == 'Windows':
+        import pdfkit
+        config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+        pdf = pdfkit.from_string(rendered_html, False, configuration=config)
+    else:
+        from weasyprint import HTML
+        pdf = HTML(string=rendered_html).write_pdf()
 
-    pdf = pdfkit.from_string(rendered_html, False, configuration=config)
-
-    # Return as inline content
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline; filename=preview.pdf'
@@ -342,7 +332,7 @@ def get_predicts():
 
     except Exception as e:
         print("❌Prediction failed:", e)
-        return render_template("predicts.html", repr(e))
+        return render_template("predicts.html",repr(e))
 
 
 if __name__ == "__main__":
