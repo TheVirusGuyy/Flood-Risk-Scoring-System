@@ -342,9 +342,7 @@ def get_predicts():
 
     except Exception as e:
         print("❌Prediction failed:", e)
-        return render_template("predicts.html",
-                               cities=cities_selected,
-                               cityname="Oops, we weren't able to retrieve data for that city.")
+        return render_template("predicts.html", repr(e))
 
 
 if __name__ == "__main__":
