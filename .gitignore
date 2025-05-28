@@ -15,7 +15,7 @@ env/
 
 # Data files
 *.csv
-*.json
+
 
 # OS files
 .DS_Store

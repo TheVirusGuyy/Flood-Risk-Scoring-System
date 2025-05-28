@@ -1,0 +1,374 @@
+{
+  "Delhi": {
+    "elevation": 216,
+    "drainage_index": 35.2,
+    "soil_moisture": 37.0,
+    "latitude": 28.6139,
+    "longitude": 77.209
+  },
+  "Mumbai": {
+    "elevation": 14,
+    "drainage_index": 30.1,
+    "soil_moisture": 43.0,
+    "latitude": 19.076,
+    "longitude": 72.8777
+  },
+  "Kolkata": {
+    "elevation": 9,
+    "drainage_index": 40.5,
+    "soil_moisture": 43.0,
+    "latitude": 22.5726,
+    "longitude": 88.3639
+  },
+  "Devanahalli": {
+  "elevation": 940,
+  "drainage_index": 48.5,
+  "soil_moisture": 46.0,
+  "latitude": 13.2433,
+  "longitude": 77.7139
+},
+
+  "Udupi": {
+    "elevation": 27,
+    "drainage_index": 38.5,
+    "soil_moisture": 81.0,
+    "latitude": 13.340881,
+    "longitude": 74.742142
+  },
+  "Chennai": {
+    "elevation": 6,
+    "drainage_index": 28.3,
+    "soil_moisture": 42.0,
+    "latitude": 13.0827,
+    "longitude": 80.2707
+  },
+  "Bangalore": {
+    "elevation": 920,
+    "drainage_index": 52.1,
+    "soil_moisture": 50.0,
+    "latitude": 12.9716,
+    "longitude": 77.5946
+  },
+  "Hyderabad": {
+    "elevation": 542,
+    "drainage_index": 47.6,
+    "soil_moisture": 45.0,
+    "latitude": 17.385,
+    "longitude": 78.4867
+  },
+  "Ahmedabad": {
+    "elevation": 53,
+    "drainage_index": 42.7,
+    "soil_moisture": 34.0,
+    "latitude": 23.0225,
+    "longitude": 72.5714
+  },
+  "Pune": {
+    "elevation": 560,
+    "drainage_index": 49.0,
+    "soil_moisture": 47.0,
+    "latitude": 18.5204,
+    "longitude": 73.8567
+  },
+  "Patna": {
+    "elevation": 53,
+    "drainage_index": 31.2,
+    "soil_moisture": 33.0,
+    "latitude": 25.5941,
+    "longitude": 85.1376
+  },
+  "Guwahati": {
+    "elevation": 55,
+    "drainage_index": 38.9,
+    "soil_moisture": 59.0,
+    "latitude": 26.1445,
+    "longitude": 91.7362
+  },
+  "Lucknow": {
+    "elevation": 123,
+    "drainage_index": 33.8,
+    "soil_moisture": 32.0,
+    "latitude": 26.8467,
+    "longitude": 80.9462
+  },
+  "Kanpur": {
+    "elevation": 126,
+    "drainage_index": 34.5,
+    "soil_moisture": 32.0,
+    "latitude": 26.4499,
+    "longitude": 80.3319
+  },
+  "Nagpur": {
+    "elevation": 310,
+    "drainage_index": 32.8,
+    "soil_moisture": 41.0,
+    "latitude": 21.1458,
+    "longitude": 79.0882
+  },
+  "Thiruvananthapuram": {
+    "elevation": 16,
+    "drainage_index": 45.5,
+    "soil_moisture": 48.0,
+    "latitude": 8.5241,
+    "longitude": 76.9366
+  },
+  "Ranchi": {
+    "elevation": 651,
+    "drainage_index": 50.7,
+    "soil_moisture": 36.0,
+    "latitude": 23.3441,
+    "longitude": 85.3096
+  },
+  "Raipur": {
+    "elevation": 298,
+    "drainage_index": 44.8,
+    "soil_moisture": 36.0,
+    "latitude": 21.2514,
+    "longitude": 81.6296
+  },
+  "Coimbatore": {
+    "elevation": 411,
+    "drainage_index": 43.9,
+    "soil_moisture": 65.0,
+    "latitude": 11.0168,
+    "longitude": 76.9558
+  },
+  "Madurai": {
+    "elevation": 101,
+    "drainage_index": 39.6,
+    "soil_moisture": 51.0,
+    "latitude": 9.9252,
+    "longitude": 78.1198
+  },
+  "Varanasi": {
+    "elevation": 81,
+    "drainage_index": 40.2,
+    "soil_moisture": 34.0,
+    "latitude": 25.3176,
+    "longitude": 82.9739
+  },
+  "Surat": {
+    "elevation": 13,
+    "drainage_index": 36.8,
+    "soil_moisture": 46.0,
+    "latitude": 21.1702,
+    "longitude": 72.8311
+  },
+  "Vijayawada": {
+    "elevation": 11,
+    "drainage_index": 39.5,
+    "soil_moisture": 43.0,
+    "latitude": 16.5062,
+    "longitude": 80.648
+  },
+  "Bhubaneswar": {
+    "elevation": 45,
+    "drainage_index": 47.2,
+    "soil_moisture": 31.0,
+    "latitude": 20.2961,
+    "longitude": 85.8245
+  },
+  "Agartala": {
+    "elevation": 12,
+    "drainage_index": 48.7,
+    "soil_moisture": 40.0,
+    "latitude": 23.8315,
+    "longitude": 91.2868
+  },
+  "Thrissur": {
+    "elevation": 76,
+    "drainage_index": 35.1,
+    "soil_moisture": 69.0,
+    "latitude": 10.5276,
+    "longitude": 76.2144
+  },
+  "Mangaluru": {
+    "elevation": 22,
+    "drainage_index": 37.8,
+    "soil_moisture": 82.0,
+    "latitude": 12.9141,
+    "longitude": 74.856
+  },
+  "Bilaspur": {
+    "elevation": 264,
+    "drainage_index": 44.3,
+    "soil_moisture": 25.0,
+    "latitude": 22.0797,
+    "longitude": 82.1391
+  },
+  "Panaji": {
+    "elevation": 7,
+    "drainage_index": 41.0,
+    "soil_moisture": 41.0,
+    "latitude": 15.4909,
+    "longitude": 73.8278
+  },
+  "Imphal": {
+    "elevation": 786,
+    "drainage_index": 46.2,
+    "soil_moisture": 52.0,
+    "latitude": 24.817,
+    "longitude": 93.9368
+  },
+  "Itanagar": {
+    "elevation": 320,
+    "drainage_index": 45.9,
+    "soil_moisture": 61.0,
+    "latitude": 27.0844,
+    "longitude": 93.6053
+  },
+  "Aizawl": {
+    "elevation": 1132,
+    "drainage_index": 48.4,
+    "soil_moisture": 46.0,
+    "latitude": 23.7271,
+    "longitude": 92.7176
+  },
+  "Kohima": {
+    "elevation": 1444,
+    "drainage_index": 50.5,
+    "soil_moisture": 63.0,
+    "latitude": 25.6747,
+    "longitude": 94.11
+  },
+  "Shillong": {
+    "elevation": 1496,
+    "drainage_index": 49.3,
+    "soil_moisture": 63.0,
+    "latitude": 25.5788,
+    "longitude": 91.8933
+  },
+  "Tirunelveli": {
+    "elevation": 47,
+    "drainage_index": 38.7,
+    "soil_moisture": 44.0,
+    "latitude": 8.7139,
+    "longitude": 77.7567
+  },
+  "Dibrugarh": {
+    "elevation": 108,
+    "drainage_index": 40.8,
+    "soil_moisture": 64.0,
+    "latitude": 27.4728,
+    "longitude": 94.912
+  },
+  "Nanded": {
+    "elevation": 361,
+    "drainage_index": 44.9,
+    "soil_moisture": 47.0,
+    "latitude": 19.1383,
+    "longitude": 77.321
+  },
+  "Srinagar": {
+    "elevation": 1585,
+    "drainage_index": 50.8,
+    "soil_moisture": 68.0,
+    "latitude": 34.0837,
+    "longitude": 74.7973
+  },
+  "Puducherry": {
+    "elevation": 3,
+    "drainage_index": 36.3,
+    "soil_moisture": 38.0,
+    "latitude": 11.9416,
+    "longitude": 79.8083
+  },
+  "Shimla": {
+    "elevation": 2276,
+    "drainage_index": 60.2,
+    "soil_moisture": 37.0,
+    "latitude": 31.1048,
+    "longitude": 77.1734
+  },
+  "Gangtok": {
+    "elevation": 1650,
+    "drainage_index": 55.4,
+    "soil_moisture": 84.0,
+    "latitude": 27.3314,
+    "longitude": 88.6138
+  },
+  "Dispur": {
+    "elevation": 55,
+    "drainage_index": 38.6,
+    "soil_moisture": 59.0,
+    "latitude": 26.1356,
+    "longitude": 91.8
+  },
+  "Amaravati": {
+    "elevation": 32,
+    "drainage_index": 42.3,
+    "soil_moisture": 43.0,
+    "latitude": 16.5417,
+    "longitude": 80.515
+  },
+  "Jaipur": {
+    "elevation": 431,
+    "drainage_index": 29.1,
+    "soil_moisture": 19.0,
+    "latitude": 26.9124,
+    "longitude": 75.7873
+  },
+  "Jammu": {
+    "elevation": 327,
+    "drainage_index": 48.2,
+    "soil_moisture": 35.0,
+    "latitude": 32.7266,
+    "longitude": 74.857
+  },
+  "Dehradun": {
+    "elevation": 435,
+    "drainage_index": 46.7,
+    "soil_moisture": 52.0,
+    "latitude": 30.3165,
+    "longitude": 78.0322
+  },
+  "Jamshedpur": {
+    "elevation": 159,
+    "drainage_index": 42.8,
+    "soil_moisture": 35.0,
+    "latitude": 22.8046,
+    "longitude": 86.2029
+  },
+  "Nashik": {
+    "elevation": 584,
+    "drainage_index": 51.5,
+    "soil_moisture": 49.0,
+    "latitude": 19.9975,
+    "longitude": 73.7898
+  },
+  "Udaipur": {
+    "elevation": 598,
+    "drainage_index": 44.8,
+    "soil_moisture": 33.0,
+    "latitude": 24.5854,
+    "longitude": 73.7125
+  },
+  "Bikaner": {
+    "elevation": 242,
+    "drainage_index": 28.3,
+    "soil_moisture": 34.0,
+    "latitude": 28.0229,
+    "longitude": 73.3119
+  },
+  "Silchar": {
+    "elevation": 25,
+    "drainage_index": 42.2,
+    "soil_moisture": 57.0,
+    "latitude": 24.8333,
+    "longitude": 92.7789
+  },
+  "Alappuzha": {
+    "elevation": 1,
+    "drainage_index": 47.1,
+    "soil_moisture": 61.0,
+    "latitude": 9.4981,
+    "longitude": 76.3388
+  },
+  "Bhagalpur": {
+    "elevation": 52,
+    "drainage_index": 34.7,
+    "soil_moisture": 35.0,
+    "latitude": 25.2545,
+    "longitude": 87.0036
+  }
+}
