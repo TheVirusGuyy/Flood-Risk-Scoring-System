@@ -1,12 +1,12 @@
 import os
-from together import Together
+import together
 from dotenv import load_dotenv
 
 # Load .env file if available
 load_dotenv()
 
 # Get API key from environment
-TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
+together.api_key = TOGETHER_API_KEY
 if not TOGETHER_API_KEY:
     raise ValueError("TOGETHER_API_KEY not found in environment variables.")
 
@@ -18,7 +18,7 @@ MODEL_NAME = "meta-llama/Llama-3.2-3B-Instruct-Turbo"
 
 def generate_summary(prompt: str) -> str:
     try:
-        response = client.chat.completions.create(
+        response = together.chat.completions.create(
             model=MODEL_NAME,
             messages=[
                 {
