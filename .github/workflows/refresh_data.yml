@@ -2,8 +2,8 @@ name: Refresh Flood Data
 
 on:
   schedule:
-    - cron: '0 */3 * * *'  # Every 3 hours
-  workflow_dispatch:
+    - cron: '0 */1 * * *'  # Runs every 1 hours
+  workflow_dispatch:        # Allows manual trigger
 
 jobs:
   refresh:
@@ -22,13 +22,16 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Set up environment
+    - name: Set up environment variables
       run: |
         echo "WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}" >> .env
         echo "TOGETHER_API_KEY=${{ secrets.TOGETHER_API_KEY }}" >> .env
 
     - name: Run flood data generator
       run: python generate_plotting_data.py
+
+    - name: Ensure we’re on master
+      run: git checkout master
 
     - name: Push updated data to GitHub
       env:
@@ -37,6 +40,7 @@ jobs:
         git config --global user.name "flood-bot"
         git config --global user.email "bot@example.com"
         git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
+        git remote -v
         git add plot_data_cache.json
         git commit -m "Auto update flood data [skip ci]" || echo "No changes to commit"
-        git push origin HEAD:master
+        git push origin master
