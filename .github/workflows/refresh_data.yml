@@ -2,16 +2,18 @@ name: Refresh Flood Data
 
 on:
   schedule:
-    - cron: '0 */1 * * *'  # Runs every 1 hours
-  workflow_dispatch:        # Allows manual trigger
+    - cron: '0 */3 * * *'  # Runs every 3 hours
+  workflow_dispatch:        # Allows manual run
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout repo using PAT
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GH_PAT }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -30,17 +32,10 @@ jobs:
     - name: Run flood data generator
       run: python generate_plotting_data.py
 
-    - name: Ensure we’re on master
-      run: git checkout master
-
-    - name: Push updated data to GitHub
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT }}
+    - name: Commit and push updated data
       run: |
         git config --global user.name "flood-bot"
         git config --global user.email "bot@example.com"
-        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
-        git remote -v
         git add plot_data_cache.json
-        git commit -m "Auto update flood data [skip ci]" || echo "No changes to commit"
+        git commit -m "Auto update flood data [skip ci]" || echo "No changes"
         git push origin master
