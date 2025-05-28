@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FloodML – Insights & Risk Analytics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Leaflet (original heatmap style from plots.html) -->
+  <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/rowanwins/leaflet-easyPrint/dist/bundle.min.js"></script>
+
+  <!-- SheetJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    /* === Original Styles (unchanged) === */
+    .card {
+      transition: all 0.3s ease;
+      border-radius: 14px;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      text-align: center;
+      font-weight: 600;
+    }
+    .bg-info {
+      background-color: #5bc0de !important;
+      color: white !important;
+    }
+    .chart-container canvas {
+      max-height: 220px;
+    }
+    .list-group-item:hover {
+      background-color: #f4f4f4;
+    }
+    .leaflet-container {
+      border-radius: 12px;
+    }
+    .btn-excel {
+      background-color: #217346;
+      color: white;
+      border: none;
+    }
+    .btn-excel:hover {
+      background-color: #1a5e38;
+      color: white;
+    }
+
+    /* === New: Export Button at Top-Right === */
+    #export-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #217346;
+      color: white;
+      border: none;
+      z-index: 1000;
+    }
+    #export-btn:hover {
+      background-color: #1a5e38;
+    }
+
+    /* === New: Overlay Styles === */
+    #excel-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1500;
+    }
+    .overlay-content {
+      display: flex;
+      flex-direction: column;
+      width: 90%;
+      height: 80%;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      transform-origin: top right;
+      transform: scale(0);
+      animation: oozing 0.5s forwards ease-out;
+    }
+    @keyframes oozing {
+      0%   { transform: scale(0.1); opacity: 0; }
+      60%  { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .overlay-header {
+      padding: 12px 20px;
+      background: #217346;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .overlay-header h4 {
+      margin: 0;
+      font-weight: 600;
+    }
+    .overlay-body {
+      flex: 1;
+      overflow: auto;
+      padding: 10px 20px;
+    }
+    .overlay-body table {
+      width: max-content;
+      min-width: 100%;
+    }
+    .overlay-footer {
+      padding: 10px 20px;
+      background: #f8f9fa;
+      display: flex;
+      justify-content: flex-end;
+    }
+    #download-btn {
+      background-color: #217346;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+    }
+    #download-btn:hover {
+      background-color: #1a5e38;
+    }
+    .btn-close-white {
+      filter: invert(1) brightness(2);
+    }
+  </style>
+</head>
+<body>
+{% set active_page = 'heatmaps' %}
+{% include 'navbar.html' %}
+
+<div class="container-fluid px-lg-4 py-4" style="position: relative;">
+  <!-- Moved & Renamed Export Button -->
+  <button id="export-btn" class="btn btn-excel" onclick="openOverlay()">
+    <i class="fas fa-file-excel me-1"></i>Export Collected Data to Excel
+  </button>
+
+  <div class="text-center mb-4">
+    <h2 class="fw-bold mb-3">
+      <i class="fas fa-chart-line text-info me-2"></i>Insights & Risk Analytics
+    </h2>
+    <!-- Original Export All Data button removed -->
+  </div>
+
+  <div class="row gx-4 gy-4">
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-header bg-info"><i class="fas fa-chart-pie me-2"></i>Flood Risk Categories</div>
+        <div class="card-body chart-container">
+          <canvas id="chart-risk-distribution"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card h-100">
+        <div class="card-header bg-info"><i class="fas fa-bolt me-2"></i>Top 5 Risk</div>
+        <div class="card-body chart-container">
+          <canvas id="chart-top-risk"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="card h-100">
+        <div class="card-header bg-info"><i class="fas fa-cloud-showers-heavy me-2"></i>Top Rainfall</div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush" id="list-top-rainfall"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row gx-4 gy-4 mt-2">
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-header bg-info d-flex justify-content-between align-items-center">
+          <span><i class="fas fa-project-diagram me-2"></i>City Radar</span>
+          <select id="city-select" class="form-select form-select-sm w-auto"style="font-size: 18px;"></select>
+        </div>
+        <div class="card-body">
+          <canvas id="chart-city-metrics" style="height: 320px;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card h-100">
+        <div class="card-header bg-info"><i class="fas fa-map-marked-alt me-2"></i>Risk Intensity Map</div>
+        <div class="card-body p-0">
+          <div id="heatmap-india" style="width:100%; height:700px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- === New: Excel Preview Overlay === -->
+<div id="excel-overlay">
+  <div class="overlay-content">
+    <div class="overlay-header">
+      <div><i class="fas fa-file-excel me-2"></i><h4>Excel Preview</h4></div>
+      <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="closeOverlay()"></button>
+    </div>
+    <div class="overlay-body">
+      <table id="excel-preview" class="table table-striped table-hover"></table>
+    </div>
+    <div class="overlay-footer">
+      <button id="download-btn" onclick="exportToExcel()">
+        <i class="fas fa-download me-1"></i>Download
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let radarChart;
+document.addEventListener('DOMContentLoaded', async () => {
+  const resp = await fetch('/plot_data_cache.json');
+  const data = await resp.json();
+  renderRiskDistribution(data);
+  renderTopRisk(data);
+  renderTopRainfall(data);
+  setupCitySelector(data);
+  renderRadarChart(data[0]);
+  renderLeafletMap(data);
+});
+
+function renderRiskDistribution(data) {
+  const counts = { 'Lowest': 0, 'Low': 0, 'Moderate': 0, 'High': 0 };
+
+  data.forEach(d => {
+    if (counts.hasOwnProperty(d.risk)) {
+      counts[d.risk]++;
+    }
+  });
+
+  new Chart(document.getElementById('chart-risk-distribution'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(counts),
+      datasets: [{
+        data: Object.values(counts),
+        backgroundColor: ['#1abc9c', '#2ecc71', '#f39c12', '#e74c3c']  // Minimal, Low, Moderate, High
+      }]
+    },
+    options: {
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.label}: ${ctx.raw} cities`
+          }
+        },
+        legend: {
+          position: 'bottom'
+        }
+      },
+      cutout: '70%'
+    }
+  });
+}
+
+
+function renderTopRisk(data) {
+  const top = [...data].sort((a,b)=>b.score-a.score).slice(0,5);
+  new Chart(document.getElementById('chart-top-risk'), {
+    type: 'bar',
+    data: {
+      labels: top.map(d => d.city),
+      datasets: [{ data: top.map(d => d.score), backgroundColor: '#3498db', borderRadius: 5 }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+function renderTopRainfall(data) {
+  const top = [...data].sort((a,b)=>b.rain_3d-a.rain_3d).slice(0,5);
+  const ul = document.getElementById('list-top-rainfall');
+  ul.innerHTML = '';
+  top.forEach(d => {
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between';
+    li.innerHTML = `<span>${d.city}</span><span>${d.rain_3d.toFixed(2)} mm</span>`;
+    ul.appendChild(li);
+  });
+}
+
+function setupCitySelector(data) {
+  const sel = document.getElementById('city-select');
+  data.forEach(d => sel.add(new Option(d.city, d.city)));
+  sel.addEventListener('change', () => {
+    const chosen = data.find(c => c.city === sel.value);
+    renderRadarChart(chosen);
+  });
+}
+
+function renderRadarChart(d) {
+  if (radarChart) radarChart.destroy();
+  const valRain     = Math.min(d.rain_3d, 300);
+  const valForecast = d.rain_forecast * 20;
+  const valPop      = d.pop * 300;
+  const valHumidity = d.humidity * 3;
+  const valCloud    = d.cloud * 3;
+  const valTemp     = d.temp * 6;
+  const valElev     = d.elevation * 0.5;
+  const valDrainage = d.drainage * 3;
+  const valSoil     = d.soil_moisture * 3;
+
+  radarChart = new Chart(document.getElementById('chart-city-metrics'), {
+    type: 'radar',
+    data: {
+      labels: ['Rain(3d)','Forecast','Prob%','Humidity','Cloud%','Temp°C','Elev m','Drainage','Soil m%'],
+      datasets: [{
+        label: d.city,
+        data: [valRain,valForecast,valPop,valHumidity,valCloud,valTemp,valElev,valDrainage,valSoil],
+        backgroundColor: 'rgba(52,152,219,0.4)',
+        borderColor: '#1f4e79',
+        pointBackgroundColor: '#1f4e79',
+        pointBorderColor: '#fff',
+        pointHoverRadius: 10
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          suggestedMin: 0,
+          suggestedMax: 300,
+          grid: { color: '#ccc' },
+          angleLines: { color: '#ccc' },
+          ticks: {
+            backdropColor: 'transparent',
+            color: '#666',
+            font: {
+              size: 18
+            }
+          },
+          pointLabels: {
+            color: '#333',
+            font: {
+              weight: 'bold',
+              size: 18
+            }
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false,
+          labels: {
+            font: {
+              size: 18
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+
+function renderLeafletMap(data) {
+  const lats   = data.map(d => d.latitude),
+        lons   = data.map(d => d.longitude),
+        scores = data.map(d => d.score),
+        text   = data.map(d =>
+          `${d.city}<br><b>Risk:</b> ${d.risk}<br><b>Score:</b> ${d.score}`
+        );
+
+  const heatTrace = {
+    type: 'densitymapbox',
+    lat: lats,
+    lon: lons,
+    z: scores.map(s => s / 100),
+    radius: 25,
+    // Updated to a smoother YlOrRd sequential color scale
+    colorscale: [
+      [0.0, 'rgb(255,255,204)'],
+      [0.2, 'rgb(255,237,160)'],
+      [0.4, 'rgb(254,217,118)'],
+      [0.6, 'rgb(254,178,76)'],
+      [0.8, 'rgb(253,141,60)'],
+      [1.0, 'rgb(240,59,32)']
+    ],
+    hoverinfo: 'skip'
+  };
+
+  const hoverTrace = {
+    type: 'scattermapbox',
+    lat: lats,
+    lon: lons,
+    text: text,
+    mode: 'markers',
+    hoverinfo: 'text',
+    marker: { size: 10, opacity: 0, color: 'transparent' }
+  };
+
+  const layout = {
+    mapbox: {
+      style: 'open-street-map',
+      center: { lat: 22.5, lon: 80 },
+      zoom: 4
+    },
+    margin: { t: 0, b: 0, l: 0, r: 0 },
+    hovermode: 'closest',
+    autosize: true
+  };
+
+  const config = {
+    responsive: true,
+    displayModeBar: true,
+    displaylogo: false,
+    toImageButtonOptions: {
+      format: 'png',
+      filename: 'FloodML_Heatmap',
+      height: 700,
+      width: 1000,
+      scale: 1.5
+    },
+    modeBarButtonsToRemove: [],
+    modeBarStyle: {
+      transform: 'scale(1.8)',
+      transformOrigin: 'top right'
+    }
+  };
+
+  Plotly.newPlot('heatmap-india', [heatTrace, hoverTrace], layout, config);
+}
+
+
+// === New: Overlay Controls ===
+function openOverlay() {
+  const overlay = document.getElementById('excel-overlay');
+  const table   = document.getElementById('excel-preview');
+  table.innerHTML = '';
+  fetch('/plot_data_cache.json')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.length) return;
+      // header row
+      const header = document.createElement('tr');
+      Object.keys(data[0]).forEach(k => {
+        const th = document.createElement('th'); th.textContent = k;
+        header.appendChild(th);
+      });
+      table.appendChild(header);
+      // data rows
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        Object.values(row).forEach(v => {
+          const td = document.createElement('td');
+          td.textContent = (typeof v === 'number') ? v.toFixed(2) : v;
+          tr.appendChild(td);
+        });
+        table.appendChild(tr);
+      });
+      overlay.style.display = 'flex';
+    });
+}
+
+function closeOverlay() {
+  document.getElementById('excel-overlay').style.display = 'none';
+}
+
+// === Unchanged Export to Excel ===
+function exportToExcel() {
+  fetch('/plot_data_cache.json')
+    .then(r => r.json())
+    .then(data => {
+      const ws = XLSX.utils.json_to_sheet(
+        data.map(d => ({
+          City: d.city,
+          Score: d.score,
+          Risk: d.risk,
+          'Rain(3d)': d.rain_3d,
+          Forecast: d.rain_forecast,
+          'Prob%': d.pop,
+          Humidity: d.humidity,
+          'Cloud%': d.cloud,
+          'Temp°C': d.temp,
+          'Elev m': d.elevation,
+          Drainage: d.drainage,
+          'Soil m%': d.soil_moisture
+        }))
+      );
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'FloodML');
+      XLSX.writeFile(wb, `FloodML_${Date.now()}.xlsx`);
+    });
+}
+
+// Close overlay when clicking outside content
+document.getElementById('excel-overlay').addEventListener('click', e => {
+  if (e.target.id === 'excel-overlay') closeOverlay();
+});
+</script>
+</body>
+</html>

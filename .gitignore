@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pkl
+
+# Environment
+.env
+floodml_env/
+venv/
+env/
+
+# VSCode settings
+.vscode/
+
+# Data files
+*.csv
+*.json
+
+# OS files
+.DS_Store
+Thumbs.db

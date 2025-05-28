@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FloodML</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #264653;
+      --accent-color: #2a9d8f;
+      --bg-light: #ffffff;
+      --color: #2a9d8f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg-light);
+      color: #1b1b1b;
+      line-height: 1.6;
+    }
+
+    .toggle-profile {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    .toggle-profile button {
+      background: var(--accent-color);
+      border: none;
+      padding: 12px 26px;
+      border-radius: 24px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .profile-overlay {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      width: 320px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      padding: 30px;
+      display: none;
+      animation: oozeIn 0.4s ease-out;
+      transform-origin: top right;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .profile-overlay.show {
+      display: flex;
+    }
+
+    .profile-overlay img {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 16px;
+    }
+
+    .profile-overlay a {
+      color: var(--accent-color);
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 1.05rem;
+    }
+
+    @keyframes oozeIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    header.hero {
+      background: linear-gradient(160deg, var(--primary-color), #3a6f72);
+      color: white;
+      padding: 100px 0 0;
+      position: relative;
+      overflow: hidden;
+      height: auto;
+    }
+
+    .hero .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero .content {
+      flex: 1 1 55%;
+    }
+
+    .hero h1 {
+      font-size: 3.4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      max-width: 500px;
+    }
+
+    .hero .btns a {
+      display: inline-block;
+      margin-right: 20px;
+      padding: 12px 26px;
+      background: var(--accent-color);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 40px;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .hero .btns a:hover {
+      background: #21867a;
+    }
+    .hero .container {
+        position: relative;
+        z-index: 2;
+      }
+
+      .waves {
+        z-index: 1; /* Already set, but ensure it's below container */
+      }
+
+
+    .visual-container {
+      flex: 1 1 40%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 35px;
+    }
+
+    .floating-right-img {
+      width: 100%;
+      max-width: 500px;
+      animation: floatY 2.0s ease-in-out infinite;
+    }
+
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(20px); }
+    }
+
+    /* New Waves */
+    .waves {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 250px;
+      background-color: var(--color);
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+      transition: 500ms;
+      z-index: 0;
+    }
+
+    .waves::before,
+    .waves::after {
+      content: '';
+      position: absolute;
+      width: 300vw;
+      height: 310vw;
+      top: -65vw;
+      left: 50%;
+      transform: translate(-50%, -75%);
+    }
+
+    .waves::before {
+      border-radius: 44%;
+      background: rgba(51, 51, 51, 1);
+      animation: waves 8s linear infinite;
+    }
+
+    .waves::after {
+      border-radius: 44%;
+      background: rgba(51, 51, 51, 0.5);
+      animation: waves 15s linear infinite;
+    }
+
+    @keyframes waves {
+      0% {
+        transform: translate(-50%, -75%) rotate(0deg);
+      }
+      100% {
+        transform: translate(-50%, -75%) rotate(360deg);
+      }
+    }
+
+    section.about, section.why-us, section.services {
+      text-align: center;
+      padding: 60px 40px;
+      background: #f9fafc;
+    }
+
+    section h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+
+    .why-us p {
+      font-size: 1.1rem;
+      max-width: 850px;
+      margin: 0 auto 20px;
+      color: #444;
+    }
+
+    .service-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .service-card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      width: 250px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .service-card i {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: var(--accent-color);
+    }
+
+    .service-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .service-card p {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .service-card a {
+      display: block;
+      margin-top: 15px;
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    footer {
+      padding: 60px 40px;
+      background: #264653;
+      color: white;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="toggle-profile">
+    <button onclick="document.querySelector('.profile-overlay').classList.toggle('show')">Project by</button>
+    <div class="profile-overlay">
+      <img src="{{ url_for('static', filename='img/anand.png') }}" alt="Profile">
+      <a href="https://www.linkedin.com/in/anand-prakash-gupta/" target="_blank">
+        <i class="bi bi-linkedin" style="font-size: 1.8rem; color: #0a66c2;"></i>
+      </a>
+    </div>
+  </div>
+  
+  <header class="hero">
+    <div class="container">
+      <div class="content">
+        <h1>Flood Risk Scoring System</h1>
+        <p>Helping prepare people and their governments, one flood prediction at a time.</p>
+        <div class="btns">
+          <a href="#services">Start Now</a>
+          <a href="predicts.html">Watch Demo</a>
+        </div>
+      </div>
+      <div class="visual-container">
+        <img src="{{ url_for('static', filename='img/floodHome3.png') }}" alt="Flooded Car" class="floating-right-img">
+      </div>
+    </div>
+    <div class="waves"></div>
+  </header>
+
+  <section class="about">
+    <h2>About FRSS</h2>
+    <p>FRSS is an intelligent flood risk monitoring and reporting platform designed to enhance disaster preparedness across Indian cities using real-time weather data and AI-driven analysis.</p>
+  </section>
+
+  <section class="why-us">
+    <h2>Why Choose FloodML?</h2>
+    <p>By combining live weather APIs, machine learning models, and location-aware scoring, FRSS delivers city-specific flood risk predictions, interactive dashboards, and AI-generated summaries — all built to help communities anticipate, assess, and act on flood threats more effectively.
+
+    </p>
+  </section>
+
+  <section class="services" id="services">
+    <h2>Our Services</h2>
+    <div class="service-grid">
+      <div class="service-card">
+        <i class="bi bi-bar-chart-line"></i>
+        <h3>Interactive Dashboard</h3>
+        <p>Explore flood risk categories, city-wise radar, and rainfall patterns with visual insights.</p>
+        <a href="dashboard.html">Go to Dashboard</a>
+      </div>
+      <div class="service-card">
+        <i class="bi bi-cpu"></i>
+        <h3>AI Summary Generator</h3>
+        <p>Generate region-wise flood summaries using AI for decision support and communication.</p>
+        <a href="digest.html">Open HydroIntel</a>
+      </div>
+      <div class="service-card">
+        <i class="bi bi-bar-chart"></i>
+        <h3>Flood Plots</h3>
+        <p>Visual plots for historical and predictive flood data analysis and trends.</p>
+        <a href="plots.html">View Plots</a>
+      </div>
+      <div class="service-card">
+        <i class="bi bi-lightning-fill"></i>
+        <h3>Flood Scoring</h3>
+        <p>Run live models to predict flood occurrences based on multiple environmental parameters.</p>
+        <a href="predicts.html">Try Prediction</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>FRSS © 2025. All Rights Reserved.</p>
+    <small>Made with purpose and precision.</small>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FloodML Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    body {
+    font-family: 'Segoe UI Emoji', 'Noto Color Emoji', 'Segoe UI', 'Roboto', sans-serif;
+    margin: 40px;
+    background-color: #f9f9f9;
+    color: #2e2e2e;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      color: #003366;
+      margin-bottom: 5px;
+    }
+
+    .meta {
+      font-size: 0.9em;
+      color: #555;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .report-container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    h2, h3 {
+      color: #1a73e8;
+      margin-top: 25px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
+    }
+
+    strong {
+      color: #2b2b2b;
+    }
+
+    p {
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.85em;
+      color: #888;
+      margin-top: 40px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FloodML - AI-Powered Flood Summary</h1>
+    <div class="meta">
+      {{ region }} Report &nbsp;&nbsp;|&nbsp;&nbsp; Generated on {{ timestamp }}
+    </div>
+  </header>
+
+  <div class="report-container">
+    {{ html_body | safe }}
+  </div>
+
+  <div class="footer">
+    FloodML Project © {{ timestamp[-4:] }} | Visual AI Reports
+  </div>
+</body>
+</html>

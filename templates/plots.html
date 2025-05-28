@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>FloodML – Dashboard</title>
+  <link href="static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <link href="static/lib/ionicons/css/ionicons.min.css" rel="stylesheet">
+  <link href="static/css/style.css" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+    }
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 5px 0 5px;
+      text-align: center;
+    }
+    .map-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(60, 130, 255, 0.25);
+      padding: 10px 15px 15px;
+      margin-bottom: 48px;
+      border: 1px solid #cce5ff;
+    }
+    .map-container {
+      height: 800px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    header#header {
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .logo img {
+      margin-top: -5px;
+      min-height: 50px;
+    }
+    .page-intro {
+      padding-top: 90px;
+      padding-bottom: 20px;
+    }
+    .modebar-container {
+      transform: scale(1.8);
+      transform-origin: top right;
+    }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+
+
+
+<main id="main">
+  <div class="container page-intro">
+    <div class="section-title" style="margin: 20px 0 20px;">FloodML – City-Level Flood Risk Dashboard</div>
+
+    <div class="map-card">
+      <div class="section-title">Live Flood Risk Overview</div>
+      <div class="map-container" id="risk-map"></div>
+    </div>
+
+    <div class="map-card">
+      <div class="section-title">Current Precipitation (3-Day Accumulated)</div>
+      <div class="map-container" id="rain-map"></div>
+    </div>
+
+    
+  </div>
+</main>
+
+<!-- Footer -->
+<footer id="footer">
+  <div class="footer-top section-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <h3>FloodML</h3>
+          <p>City-level flood risk prediction powered by machine learning, weather APIs, and geospatial data.</p>
+        </div>
+        <div class="col-lg-6">
+          <div class="footer-info">
+            <strong>Email:</strong> yourname@example.com<br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container py-4">
+    <div class="copyright">
+      &copy; Copyright <strong>FloodML</strong>. All Rights Reserved
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="static/lib/jquery/jquery.min.js"></script>
+<script src="static/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="static/js/main.js"></script>
+
+<script>
+  async function loadData() {
+    try {
+      const res = await fetch('/plot-data');
+      const data = await res.json();
+
+      const lats = data.map(d => d.latitude);
+      const lons = data.map(d => d.longitude);
+      const risks = data.map(d => d.risk);
+      const scores = data.map(d => d.score);
+      const rain = data.map(d => d.rain_3d);
+
+      const layout = {
+        mapbox: {
+          style: 'open-street-map',
+          center: { lat: 22.5, lon: 80 },
+          zoom: 4.0
+        },
+        margin: { t: 0, b: 0, l: 0, r: 0 },
+        autosize: true
+      };
+
+      // Adjusted size logic to prevent large circles for low-risk
+      const computeMarkerSize = score => {
+        if (score < 40) return 10;
+        if (score < 60) return 18;
+        return 25;
+      };
+
+      Plotly.newPlot('risk-map', [{
+        type: 'scattermapbox',
+        lat: lats,
+        lon: lons,
+        text: data.map(d => `${d.city}<br><b>Risk:</b> ${d.risk}<br><b>Score:</b> ${d.score}`),
+        marker: {
+          size: scores.map(computeMarkerSize),
+          color: risks.map(r =>
+            r === 'High Risk' ? 'red' :
+            r === 'Moderate Risk' ? 'orange' :
+            'green'
+          ),
+          opacity: 0.8,
+          line: { width: 1, color: '#fff' }
+        }
+      }], layout);
+
+      Plotly.newPlot('rain-map', [{
+        type: 'scattermapbox',
+        lat: lats,
+        lon: lons,
+        text: data.map(d => `${d.city}<br><b>Rainfall:</b> ${d.rain_3d} mm`),
+        marker: {
+          size: rain.map(r => Math.max(r / 2.5, 8)),
+          color: 'blue',
+          opacity: 0.6
+        }
+      }], layout);
+
+    } catch (err) {
+      console.error('Failed to load plot data:', err);
+      document.getElementById('risk-map').innerText = 'Error loading data';
+    }
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>
