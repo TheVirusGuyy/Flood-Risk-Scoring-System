@@ -1,13 +1,18 @@
-
 # 🌊 Flood Risk Scoring System (FRSS)
 
 > 🔍 Intelligent flood risk prediction, visualization, and AI-powered reporting for Indian cities.
 
+---
+
+**🌐 Live Project:** [https://frss.onrender.com/](https://frss.onrender.com/)
+
+---
+
 ## 📌 Overview
 
-**FRSS** (Flood Risk Scoring System) is an advanced web-based platform designed to assess and visualize flood risk across 50 Indian cities using real-time weather data, environmental attributes, and hybrid intelligence. It combines the strengths of rule-based heuristics with a trained XGBoost machine learning model to deliver accurate, interpretable flood predictions. 
+**FRSS** (Flood Risk Scoring System) is an advanced web-based platform designed to assess and visualize flood risk across 50 Indian cities using real-time weather data, environmental attributes, and hybrid intelligence. It combines the strengths of rule-based heuristics with a trained XGBoost machine learning model to deliver accurate, interpretable flood predictions.
 
-It also features natural language AI-generated summaries for decision-makers, and interactive dashboards powered by Leaflet.js and Chart.js. FRSS is built with a modular Python-Flask backend and an intuitive JavaScript-based frontend.
+It also features natural language AI-generated summaries for decision-makers, and interactive dashboards powered by Leaflet.js and Chart.js. FRSS is built with a modular Python FastAPI backend and a fully responsive, professional frontend styled with Tailwind CSS.
 
 ---
 
@@ -25,8 +30,11 @@ It also features natural language AI-generated summaries for decision-makers, an
 - 🤖 **AI-Generated Summaries**  
   LLM-powered textual interpretations (via Llama 3.2 3B from Together.ai) of flood trends, risks, and actionable insights.
 
-- 📥 **PDF & Excel Report Exports**  
-  Generate downloadable summary reports in professional formats for institutions and policymakers.
+- 📥 **PDF Report Exports**  
+  Generate downloadable, modern summary reports for institutions and policymakers.
+
+- 📱 **Responsive & Modern UI**  
+  Built with Tailwind CSS, mobile-optimized, clean navigation, and advanced UX.
 
 ---
 
@@ -36,20 +44,58 @@ It also features natural language AI-generated summaries for decision-makers, an
 
 ---
 
+## 📦 Tech Stack
+
+- **Backend:** Python, FastAPI, XGBoost, joblib
+- **Frontend:** HTML, Tailwind CSS, JS, Chart.js, Leaflet.js, Jinja2
+- **APIs:** WeatherAPI, NASA POWER (Soil Moisture)
+- **LLM:** Meta’s Llama 3.2 3B via Together.ai
+- **PDF:** WeasyPrint (Linux) / pdfkit (Windows)
+- **Deployment:** Render, GitHub Actions (data refresh)
+
+---
+
 ## 💡 Modules
 
-### 🔧 Backend
+### Backend
 - `generate_plotting_data.py` – Builds real-time feature vectors from APIs and static data.
 - `hybrid_score.py` – Applies XGBoost and merges with rule-based logic.
 - `score.py` – Fully interpretable scoring rules based on environmental thresholds.
 - `llm_runner.py` – Connects to the LLM to generate flood summaries.
-- `app.py` – Flask controller, API router, data exporter.
+- `app.py` – **FastAPI** controller, API router, data exporter.
 
-### 🎨 Frontend
+### Frontend
 - `predicts.html` – Input city, see risk score + interactive map.
 - `dashboard.html` – Donut + bar charts, rainfall rankings, Leaflet heatmaps.
 - `digest.html` – AI-generated markdown summaries with PDF download.
 - `plots.html` – Compare cities with radar and risk overlays.
+- **All pages:** Responsive, styled with Tailwind CSS.
+
+---
+
+## 📸 Screenshots
+
+### Dashboard
+
+![Dashboard](static/img/dashboard.png)
+
+---
+
+### Predict (City Score)
+
+![Predict](static/img/predict.png)
+
+---
+
+### AI Summary
+
+![Summary](static/img/summary.png)
+
+---
+
+### PDF Export
+
+![PDF Export](static/img/pdf.png)
 
 ---
 
@@ -64,42 +110,6 @@ It also features natural language AI-generated summaries for decision-makers, an
 | Accuracy     | ~63.6%           |
 
 > ⚠️ Emphasizes recall to prioritize early flood warnings even at the cost of slight over-prediction.
-
----
-
-## 📦 Tech Stack
-
-- **Backend:** Python, Flask, XGBoost, joblib
-- **Frontend:** HTML, CSS, JS, Chart.js, Leaflet.js, Jinja2
-- **APIs:** WeatherAPI, NASA POWER (Soil Moisture)
-- **LLM:** Meta’s Llama 3.2 3B via Together.ai
-- **PDF & Excel:** pdfkit, pandas
-
----
-
-## 🛠️ How to Run
-
-1. Clone this repo:
-   ```bash
-   git clone https://github.com/your-username/frss.git
-   cd frss
-   ```
-
-2. Set up environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-3. Add your `WEATHER_API_KEY` and `TOGETHER_API_KEY` to `.env`
-
-4. Run server:
-   ```bash
-   python app.py
-   ```
-
-5. Open in browser: `http://localhost:5000`
 
 ---
 
