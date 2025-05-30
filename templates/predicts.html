@@ -1,22 +1,24 @@
-{% include 'navbar.html' %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flood Risk Prediction | FloodML</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    html, body {
-      height: 100%; margin: 0; font-family: 'Inter', sans-serif; overflow: hidden;
-    }
+    html, body { height: 100%; margin: 0; font-family: 'Inter', sans-serif; }
     #map {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
     }
     .container-content {
       position: relative; z-index: 1; padding: 40px;
+      margin-top: clamp(70px, 8vw, 110px);
+      min-height: 100vh;
     }
     .search-box {
       display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 30px;
@@ -31,23 +33,37 @@
     .btn-go {
       height: 48px; padding: 0 24px; border-radius: 12px;
       background: linear-gradient(to right,#003366,#0055a5); color: #fff; font-weight:600;
-      border: none; transition: all 0.3s ease;
+      border: none; transition: all 0.18s;
+      display: flex; align-items: center; gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-go:hover, .btn-go:focus {
+      background: linear-gradient(to right,#0055a5,#003366); transform: scale(1.03);
+      box-shadow: 0 2px 14px rgba(0,85,165,0.08);
+    }
+    .btn-go:active {
+      transform: scale(0.96);
+      background: linear-gradient(to right,#003366,#0077cc);
     }
     .main-grid {
       display: grid;
       grid-template-columns: auto auto 1fr auto;
       column-gap: 30px;
       align-items: start;
+      margin-top: 16px;
     }
     .risk-card {
       width: 300px; height: 520px;
-      background: rgba(255,255,255,0.9);
       border-radius: 24px;
       box-shadow: 0 12px 30px rgba(0,0,0,0.12);
       display:flex; flex-direction:column;
       align-items:center; justify-content:center;
       text-align:center;
       padding:30px;
+      background: rgba(255,255,255,0.9);
+      color: #222;
+      transition: background 0.35s, color 0.2s;
     }
     .risk-card span {
       font-size:3.5rem; font-weight:700;
@@ -55,6 +71,7 @@
     .risk-card p {
       font-size:1.5rem; font-weight:500;
     }
+    /* Dynamic color classes */
     .risk-card.lowest { background:linear-gradient(145deg,#e0fff1,#b6f4d1); color:#056644; }
     .risk-card.low     { background:linear-gradient(145deg,#f0fcd0,#e2ef92); color:#7a6000; }
     .risk-card.moderate{ background:linear-gradient(145deg,#fff0cc,#ffe09c); color:#946d00; }
@@ -64,10 +81,10 @@
       display:flex; flex-direction:column; gap:20px;
     }
     .metric-card {
-      width:250px; height:140px;
-      background: rgba(255,255,255,0.8);
-      backdrop-filter: blur(6px);
-      border-radius:16px;
+      width:225px; height:120px;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(3px);
+      border-radius:20px;
       box-shadow:0 10px 25px rgba(0,0,0,0.1);
       display:flex; flex-direction:column;
       align-items:center; justify-content:center;
@@ -78,51 +95,223 @@
     .metric-value { font-size:2rem; font-weight:600; color:#111; }
     #pin-label {
       position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
-      background:rgba(255,255,255,0.9); padding:8px 16px;
+      background:rgba(255,255,255,0.6); padding:8px 16px;
       border-radius:10px; box-shadow:0 6px 12px rgba(0,0,0,0.15);
       z-index:2;
     }
-  </style>
+
+     /* ----------------- Mobile Responsive Styling ----------------- */
+  @media (max-width: 900px) {
+    .container-content {
+      padding: 18px 4vw 8vw 4vw;
+    }
+    .main-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin-top: 12px;
+    }
+    .metrics-column, .risk-card { width: 98vw !important; max-width: 400px; margin: 0 auto; }
+    .risk-card { height: 340px; padding: 18px; }
+    .metric-card { width: 92vw; max-width: 370px; height: 110px; }
+  }
+  @media (max-width: 650px) {
+  html, body {
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+  }
+  #map {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+  }
+  .container-content {
+    padding: 8vw 2vw 16vw 2vw;
+    margin-top: clamp(56px, 7vw, 90px);
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  .main-grid { display: none !important; }
+
+  /* --- Form & Predict Button --- */
+  .search-box {
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-bottom: 13px !important;
+    width: 100vw !important;
+    align-items: center !important;
+  }
+  .form-control {
+    width: 90vw !important;
+    max-width: 450px !important;
+    min-width: 0 !important;
+    font-size: 1.06rem !important;
+  }
+  .btn-go {
+    width: 70vw !important;
+    max-width: 280px !important;
+    min-width: 90px !important;
+    margin-top: 2px !important;
+    height: 42px !important;
+    font-size: 1.12rem !important;
+    border-radius: 12px !important;
+    justify-content: center !important;
+  }
+
+  /* --- Risk Card --- */
+  .risk-card-mobile {
+    width: 95vw !important;
+    max-width: 500px !important;
+    border-radius: 18px !important;
+    padding: 17px 0 14px 0 !important;
+    min-height: 100px !important;
+    margin-bottom: 13px !important;
+    text-align: center !important;
+    font-size: 1.13rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.11);
+    margin-left: auto; margin-right: auto;
+    flex-direction: column !important;
+    transition: background 0.32s;
+  }
+  .risk-card-mobile h3 { font-size: 1.08rem !important; margin-bottom: 0px; }
+  .risk-card-mobile .text-3xl { font-size: 2.25rem !important; line-height: 2.4rem !important;}
+  .risk-card-mobile .text-base { font-size: 1.12rem !important;}
+  .risk-card-mobile .font-semibold { margin-bottom: 0 !important;}
+
+  /* --- Risk Card Color Scheming --- */
+  .risk-card-mobile.lowest { background: linear-gradient(145deg,#e0fff1,#b6f4d1) !important; color:#056644 !important; }
+  .risk-card-mobile.low    { background: linear-gradient(145deg,#f0fcd0,#e2ef92) !important; color:#7a6000 !important; }
+  .risk-card-mobile.moderate{ background: linear-gradient(145deg,#fff0cc,#ffe09c) !important; color:#946d00 !important; }
+  .risk-card-mobile.high   { background: linear-gradient(145deg,#ffd1d1,#ff9e9e) !important; color:#a10000 !important; }
+  .risk-card-mobile.extreme{ background: linear-gradient(145deg,#ffb3b3,#ff6666) !important; color:#fff !important; }
+
+  /* --- Metric Cards Grid --- */
+  .mobile-metrics-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+    width: 100vw !important;
+    padding: 0 2vw !important;
+    margin-bottom: 15px;
+  }
+  .metric-card {
+    width: 43vw !important; min-width: 0; max-width: none;
+    height: 80px !important; min-height: 70px !important;
+    padding: 5px !important;
+    margin: 0 !important;
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(3px);
+    font-size: 1.05rem;
+    border-radius: 17px !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .metric-title { font-size:1.04rem !important; margin-bottom:2px !important;}
+  .metric-value { font-size:1.23rem !important; }
+  #pin-label { font-size: 0.98rem; padding: 2px 5px; bottom: 12px;}
+}
+
+</style>
+
 </head>
-<body>
+<body class="bg-gray-100 h-full w-full">
+  <script>
+  // Make the list of cities from FastAPI available in JS:
+    const cityList = {{ cities|tojson }};
+  </script>
+
+  {% include 'navbar.html' %}
   <div id="map"></div>
   <div class="container-content">
     <div class="search-box">
-      <form method="post" id="cityForm" class="d-flex gap-2">
-        <input type="text" name="city" class="form-control" placeholder="Enter city name..." value="{{ cityname|replace('Information about ','') }}" required>
-        <button type="submit" class="btn-go">Predict</button>
+      <form method="post" id="cityForm"
+            class="flex gap-2 flex-col sm:flex-row items-center w-full max-w-lg mx-auto relative"
+            autocomplete="off"
+            onsubmit="showLoader(event)">
+        <input type="text" name="city" class="form-control"
+               placeholder="Enter city name..." required
+               value="{{ cityname|replace('Information about ','') or city or '' }}">
+          <!-- Autocomplete dropdown -->
+        <div id="city-suggestions"
+            class="absolute left-0 top-full mt-1 w-full bg-white rounded-xl shadow-lg border border-gray-200 z-50 hidden max-h-60 overflow-auto"
+            style="font-family: inherit;"></div>
+
+        <button id="predictBtn" type="submit" class="btn-go group flex items-center justify-center relative">
+          Predict
+          <span id="btn-loader" class="hidden ml-2">
+            <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-70" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+          </span>
+        </button>
       </form>
     </div>
-    <div class="main-grid">
-      <!-- Risk Card -->
-      <div class="risk-card {% if risk %}{{ risk }}{% endif %}">  
-        <h3>Predicted Flood Risk</h3>
-        <span>{{ score or '--' }}%</span>
-        <p>{{ risk or 'No prediction yet' }}</p>
+
+    <!-- Scrollable cards only for mobile -->
+    <div id="front-scroll" class="scroll-front">
+      <!-- Desktop View (unchanged) -->
+      <div class="main-grid hidden sm:grid">
+        <!-- Risk Card -->
+        <div class="risk-card {% if risk %}{{ risk|lower }}{% endif %}">
+          <h3>Predicted Flood Risk</h3>
+          <span>{{ score or '--' }}%</span>
+          <p>{{ risk or 'No prediction yet' }}</p>
+        </div>
+        <!-- Left Metrics -->
+        <div class="metrics-column">
+          <div class="metric-card"><div class="metric-title">Temperature (°C)</div><div class="metric-value">{{ temp or '--' }}</div></div>
+          <div class="metric-card"><div class="metric-title">Humidity</div><div class="metric-value">{{ humidity or '--' }}%</div></div>
+          <div class="metric-card"><div class="metric-title">Soil Moisture</div><div class="metric-value">{{ soil_moisture or '--' }}%</div></div>
+          <div class="metric-card"><div class="metric-title">Elevation (m)</div><div class="metric-value">{{ elevation or '--' }}</div></div>
+        </div>
+        <div class="hidden lg:block"></div>
+        <!-- Right Metrics -->
+        <div class="metrics-column">
+          <div class="metric-card"><div class="metric-title">Rainfall(Last 3d)</div><div class="metric-value">{{ rain_3d or '0' }}</div></div>
+          <div class="metric-card"><div class="metric-title">Rain Forecast (48h)</div><div class="metric-value">{{ rain_2d or '--' }}</div></div>
+          <div class="metric-card"><div class="metric-title">Rain Probability</div><div class="metric-value">{{ pop or '0' }}%</div></div>
+          <div class="metric-card"><div class="metric-title">Drainage Index</div><div class="metric-value">{{ drainage or '--' }}</div></div>
+        </div>
       </div>
 
-      <!-- Left Metrics -->
-      <div class="metrics-column">
-        <div class="metric-card"><div class="metric-title">Temperature (°C)</div><div class="metric-value">{{ temp or '--' }}</div></div>
-        <div class="metric-card"><div class="metric-title">Humidity</div><div class="metric-value">{{ humidity or '--' }}%</div></div>
-        <div class="metric-card"><div class="metric-title">Soil Moisture</div><div class="metric-value">{{ soil_moisture or '--' }}%</div></div>
-        <div class="metric-card"><div class="metric-title">Elevation (m)</div><div class="metric-value">{{ elevation or '--' }}</div></div>
+      <!-- Mobile View: wide risk card, then 2x4 metric cards below -->
+      <div class="sm:hidden w-full mx-auto">
+        <div class="risk-card-mobile {% if risk %}{{ risk|lower }}{% endif %} mb-3 mx-auto">
+          <div>
+            <h3 class="text-base font-medium">Predicted Flood Risk</h3>
+            <div class="text-3xl font-bold leading-tight my-1">{{ score or '--' }}%</div>
+            <div class="text-base font-semibold">{{ risk or 'No prediction yet' }}</div>
+          </div>
+        </div>
+        <div class="mobile-metrics-grid">
+          <div class="metric-card"><div class="metric-title">Temperature (°C)</div><div class="metric-value">{{ temp or '--' }}</div></div>
+          <div class="metric-card"><div class="metric-title">Humidity</div><div class="metric-value">{{ humidity or '--' }}%</div></div>
+          <div class="metric-card"><div class="metric-title">Soil Moisture</div><div class="metric-value">{{ soil_moisture or '--' }}%</div></div>
+          <div class="metric-card"><div class="metric-title">Elevation (m)</div><div class="metric-value">{{ elevation or '--' }}</div></div>
+          <div class="metric-card"><div class="metric-title">Rainfall Last 3 Days</div><div class="metric-value">{{ rain_3d or '0' }}</div></div>
+          <div class="metric-card"><div class="metric-title">Rain Forecast (48h)</div><div class="metric-value">{{ rain_2d or '--' }}</div></div>
+          <div class="metric-card"><div class="metric-title">Rain Probability</div><div class="metric-value">{{ pop or '0' }}%</div></div>
+          <div class="metric-card"><div class="metric-title">Drainage Index</div><div class="metric-value">{{ drainage or '--' }}</div></div>
+        </div>
       </div>
-      
-      <!-- Spacer -->
-      <div></div>
-      <!-- Right Metrics -->
-      <div class="metrics-column">
-        <div class="metric-card"><div class="metric-title">Rainfall Last 3 Days</div><div class="metric-value">{{ rain_3d or '0' }}</div></div>
-        <div class="metric-card"><div class="metric-title">Rain Forecast (48h)</div><div class="metric-value">{{ rain_2d or '--' }}</div></div>
-        <div class="metric-card"><div class="metric-title">Rain Probability</div><div class="metric-value">{{ pop or '0' }}%</div></div>
-        <div class="metric-card"><div class="metric-title">Drainage Index</div><div class="metric-value">{{ drainage or '--' }}</div></div>
-      </div>
+
+    {% if pin_city %}
+      <div id="pin-label">Pinned location: {{ pin_city }}</div>
+    {% endif %}
+    <!-- Toast notification for errors -->
+    <div id="city-toast"
+        class="fixed bottom-6 right-6 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 hidden transition duration-300">
+      City not found. Please try another name.
     </div>
-    {% if pin_city %}<div id="pin-label">Pinned location: {{ pin_city }}</div>{% endif %}
+
   </div>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
+    // Fixed background, map stays fixed for all views
     const map = L.map('map').setView([20.5937,78.9629],5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
     {% if lat and lon %}
@@ -130,8 +319,155 @@
       const lonVal = {{ lon|safe }};
       L.marker([latVal,lonVal]).addTo(map);
       map.flyTo([latVal, lonVal], 12, { duration: 2 });
-
     {% endif %}
+
+    // Predict button loader logic
+    function showLoader(e) {
+      const btn = document.getElementById('predictBtn');
+      const loader = document.getElementById('btn-loader');
+      loader.classList.remove('hidden');
+      btn.classList.add('pointer-events-none','opacity-80');
+    }
+    // If page loads and predict button is disabled, reset after 2s (in case of fast reload)
+    window.addEventListener('pageshow', () => {
+      setTimeout(() => {
+        const btn = document.getElementById('predictBtn');
+        const loader = document.getElementById('btn-loader');
+        if (btn && loader) {
+          btn.classList.remove('pointer-events-none','opacity-80');
+          loader.classList.add('hidden');
+        }
+      }, 2000);
+    });
   </script>
+  <script>
+const input = document.querySelector('input[name="city"]');
+const suggestions = document.getElementById('city-suggestions');
+const toast = document.getElementById('city-toast');
+
+let suggestionItems = [];
+let highlightedIndex = -1;
+
+const fuse = new Fuse(cityList, {
+  threshold: 0.4,
+  keys: [],
+});
+
+input.addEventListener('input', function () {
+  const val = input.value.trim();
+  if (!val) {
+    suggestions.classList.add('hidden');
+    suggestionItems = [];
+    highlightedIndex = -1;
+    return;
+  }
+  const results = fuse.search(val, {limit: 8}).map(r => r.item);
+  if (results.length > 0 && !(results.length === 1 && results[0].toLowerCase() === val.toLowerCase())) {
+    suggestions.innerHTML = results.map((city, i) =>
+      `<div class="px-4 py-2 cursor-pointer hover:bg-blue-100 transition" data-city="${city}" data-idx="${i}">${city}</div>`
+    ).join('');
+    suggestions.classList.remove('hidden');
+    suggestionItems = Array.from(suggestions.children);
+    highlightedIndex = -1;
+  } else {
+    suggestions.innerHTML = '';
+    suggestions.classList.add('hidden');
+    suggestionItems = [];
+    highlightedIndex = -1;
+  }
+});
+
+// Mouse select
+suggestions.addEventListener('mousedown', function(e){
+  const city = e.target.getAttribute('data-city');
+  if (city) {
+    input.value = city;
+    suggestions.classList.add('hidden');
+    highlightedIndex = -1;
+  }
+});
+
+// Hide dropdown when clicking away
+document.addEventListener('click', function(e){
+  if (!suggestions.contains(e.target) && e.target !== input) {
+    suggestions.classList.add('hidden');
+    suggestionItems = [];
+    highlightedIndex = -1;
+  }
+});
+
+// Keyboard navigation
+input.addEventListener('keydown', function(e){
+  if (!suggestionItems.length || suggestions.classList.contains('hidden')) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (highlightedIndex < suggestionItems.length - 1) highlightedIndex++;
+    else highlightedIndex = 0;
+    updateHighlight();
+  }
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (highlightedIndex > 0) highlightedIndex--;
+    else highlightedIndex = suggestionItems.length - 1;
+    updateHighlight();
+  }
+  if (e.key === 'Enter') {
+    if (highlightedIndex >= 0 && suggestionItems[highlightedIndex]) {
+      input.value = suggestionItems[highlightedIndex].textContent;
+      suggestions.classList.add('hidden');
+      highlightedIndex = -1;
+      // Optionally, trigger form submit if desired:
+      // input.form.requestSubmit();
+    }
+  }
+});
+
+function updateHighlight() {
+  suggestionItems.forEach((item, idx) => {
+    if (idx === highlightedIndex) {
+      item.classList.add('bg-blue-100');
+    } else {
+      item.classList.remove('bg-blue-100');
+    }
+  });
+}
+
+// Submit logic unchanged
+document.getElementById('cityForm').addEventListener('submit', function(e){
+  const val = input.value.trim();
+  if (!val) {
+    showToast("Please enter a city name.");
+    e.preventDefault();
+    return;
+  }
+  const exact = cityList.find(city => city.toLowerCase() === val.toLowerCase());
+  if (exact) {
+    input.value = exact;
+    return true;
+  }
+  const result = fuse.search(val, {limit:1});
+  if (result.length && result[0].score <= 0.4) {
+    input.value = result[0].item;
+    return true;
+  }
+  e.preventDefault();
+  showToast("City not found. Please try another name.");
+});
+
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.remove('hidden');
+  toast.classList.add('opacity-100');
+  setTimeout(() => {
+    toast.classList.add('opacity-0');
+  }, 2200);
+  setTimeout(() => {
+    toast.classList.add('hidden');
+    toast.classList.remove('opacity-0');
+  }, 2700);
+}
+</script>
+
+
 </body>
 </html>

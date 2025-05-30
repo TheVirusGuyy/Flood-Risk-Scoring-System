@@ -1,37 +1,123 @@
-<!-- Clean & consistent navbar.html -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2">
-  <div class="container">
-    <!-- Brand/logo section -->
-    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="FloodML" style="height: 45px; margin-right: 10px;" />
+<!-- Overlay FIRST so menu will be above it -->
+<div id="mobile-menu-overlay" class="fixed inset-0 bg-black/10 z-30 hidden md:hidden transition-opacity duration-150"></div>
+<nav class="bg-white fixed w-full z-40 top-0 start-0 border-b border-gray-200 shadow-md transition-all backdrop-blur-md">
+  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-3 md:px-6 py-2.5 md:py-4">
+    <!-- Brand/logo -->
+    <a href="/index.html" class="flex items-center space-x-3 transition-transform hover:scale-105 hover:-translate-y-1 duration-150">
+      <img src="/static/img/FRSS.png" class="h-10" alt="FRSS Logo">
     </a>
 
-    <!-- Mobile Toggle Button -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-      data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-      aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <!-- Mobile Predict Button & Hamburger -->
+    <div class="flex md:hidden items-center space-x-2">
+      <a href="/predicts.html"
+         class="block md:hidden bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold rounded-lg text-base px-4 py-2 shadow-lg ring-2 ring-teal-200 focus:ring-4 hover:from-cyan-500 hover:to-teal-500 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all duration-150"
+         style="font-family:inherit; letter-spacing:0.01em;">
+        Predict
+      </a>
+      <button data-collapse-toggle="navbar-sticky" type="button"
+        class="inline-flex items-center p-2 w-10 h-10 justify-center text-xl text-gray-500 rounded-lg hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
+        aria-controls="navbar-sticky" aria-expanded="false">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-7 h-7 transition-transform duration-200" aria-hidden="true" fill="none" viewBox="0 0 17 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+        </svg>
+      </button>
+    </div>
 
     <!-- Nav Links -->
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link {% if active_page == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Home</a>
+    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1 z-50" id="navbar-sticky" style="position:relative;">
+      <ul class="flex flex-col p-4 md:p-0 mt-4 font-semibold border border-gray-100 rounded-xl bg-white/95 shadow-lg md:space-x-7 md:flex-row md:mt-0 md:border-0 md:bg-transparent md:shadow-none text-base md:text-lg">
+        <li>
+          <a href="/index.html" class="group nav-link block py-2 px-3 text-gray-900 hover:text-cyan-700 focus:text-teal-700 transition-all rounded-lg duration-150 hover:bg-cyan-50/70 active:bg-cyan-100/80 focus:bg-cyan-100/90 relative">
+            Home
+            <span class="absolute left-3 bottom-1 w-0 group-hover:w-4/5 h-0.5 bg-gradient-to-r from-cyan-400 to-teal-400 rounded transition-all duration-200"></span>
+          </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link {% if active_page == 'plots' %}active{% endif %}" href="{{ url_for('plots') }}">Plots</a>
+        <li>
+          <a href="/plots.html" class="group nav-link block py-2 px-3 text-gray-900 hover:text-cyan-700 focus:text-teal-700 transition-all rounded-lg duration-150 hover:bg-cyan-50/70 active:bg-cyan-100/80 focus:bg-cyan-100/90 relative">
+            Plots
+            <span class="absolute left-3 bottom-1 w-0 group-hover:w-4/5 h-0.5 bg-gradient-to-r from-cyan-400 to-teal-400 rounded transition-all duration-200"></span>
+          </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Insights</a>
+        <li>
+          <a href="/dashboard.html" class="group nav-link block py-2 px-3 text-gray-900 hover:text-cyan-700 focus:text-teal-700 transition-all rounded-lg duration-150 hover:bg-cyan-50/70 active:bg-cyan-100/80 focus:bg-cyan-100/90 relative">
+            Insights
+            <span class="absolute left-3 bottom-1 w-0 group-hover:w-4/5 h-0.5 bg-gradient-to-r from-cyan-400 to-teal-400 rounded transition-all duration-200"></span>
+          </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link {% if active_page == 'digest' %}active{% endif %}" href="{{ url_for('digest') }}">Digest</a>
+        <li>
+          <a href="/digest.html" class="group nav-link block py-2 px-3 text-gray-900 hover:text-cyan-700 focus:text-teal-700 transition-all rounded-lg duration-150 hover:bg-cyan-50/70 active:bg-cyan-100/80 focus:bg-cyan-100/90 relative">
+            Digest
+            <span class="absolute left-3 bottom-1 w-0 group-hover:w-4/5 h-0.5 bg-gradient-to-r from-cyan-400 to-teal-400 rounded transition-all duration-200"></span>
+          </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link {% if active_page == 'predicts' %}active{% endif %}" href="{{ url_for('predicts') }}">Predict</a>
+        <!-- Desktop-only Predict button -->
+        <li>
+          <a href="/predicts.html" class="hidden md:inline-block bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold rounded-lg px-5 py-2 ml-1 shadow-lg hover:from-cyan-500 hover:to-teal-500 hover:shadow-xl transition-all duration-150 focus:ring-2 focus:ring-cyan-300 active:scale-95">Predict</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const toggle = document.querySelector('[data-collapse-toggle]');
+  const nav = document.getElementById('navbar-sticky');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  function closeMenu() {
+    nav.classList.add('hidden');
+    overlay.classList.add('hidden');
+    overlay.style.opacity = 0;
+  }
+  function openMenu() {
+    nav.classList.remove('hidden');
+    nav.classList.add('animate-fade-in');
+    overlay.classList.remove('hidden');
+    overlay.style.opacity = 1;
+    nav.style.zIndex = 50;
+    overlay.style.zIndex = 30;
+  }
+  if (toggle && nav && overlay) {
+    toggle.addEventListener('click', function () {
+      if (nav.classList.contains('hidden')) {
+        openMenu();
+      } else {
+        closeMenu();
+      }
+    });
+    overlay.addEventListener('click', closeMenu);
+    // Optional: close menu when resizing up to desktop
+    window.addEventListener('resize', () => {
+      if(window.innerWidth >= 768) closeMenu();
+    });
+  }
+});
+</script>
+
+<style>
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(-15px);}
+  100% { opacity: 1; transform: translateY(0);}
+}
+.animate-fade-in { animation: fade-in 0.25s cubic-bezier(0.23, 1, 0.32, 1);}
+@media (min-width: 768px) {
+  .nav-link { font-size: 1.19rem; }
+}
+@media (max-width: 767px) {
+  #navbar-sticky {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+    border-radius: 15px !important;
+    margin-top: 15px !important;
+    margin-left: 0 !important;
+    background: rgba(255,255,255,0.97) !important;
+  }
+}
+.nav-link .group-hover\:w-4\/5 {
+  width: 0;
+}
+.nav-link:hover span,
+.nav-link:focus span {
+  width: 80% !important;
+}
+</style>

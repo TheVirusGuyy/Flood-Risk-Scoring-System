@@ -1,13 +1,18 @@
+{% include 'navbar.html' %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>FloodML – Dashboard</title>
-  <link href="static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="static/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-  <link href="static/lib/ionicons/css/ionicons.min.css" rel="stylesheet">
-  <link href="static/css/style.css" rel="stylesheet">
+  <title>FRSS – Plots</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- Ionicons -->
+  <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
+  <!-- Custom Style -->
+  <link href="/static/css/style.css" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
     body {
@@ -34,14 +39,6 @@
       border-radius: 16px;
       overflow: hidden;
     }
-    header#header {
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    }
-    .logo img {
-      margin-top: -5px;
-      min-height: 50px;
-    }
     .page-intro {
       padding-top: 90px;
       padding-bottom: 20px;
@@ -50,127 +47,188 @@
       transform: scale(1.8);
       transform-origin: top right;
     }
+
+    @media (max-width: 650px) {
+  .page-intro {
+    padding-top: 65px !important;
+    padding-bottom: 6px !important;
+  }
+  .section-title {
+    font-size: 1.15rem !important;
+    margin: 6px 0 10px !important;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
+  .map-card {
+    padding: 8px 5px 12px 5px !important;
+    margin-bottom: 22px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 14px rgba(60, 130, 255, 0.11) !important;
+  }
+  .map-container {
+    position: relative !important;         /* ensure modebar is inside */
+    height: 340px !important;
+    min-width: 0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 7px rgba(20,40,80,0.08) !important;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 98vw !important;
+  }
+  .max-w-5xl {
+    max-width: 99vw !important;
+  }
+  .px-3 {
+    padding-left: 0.7rem !important;
+    padding-right: 0.7rem !important;
+  }
+  .footer-info {
+    font-size: 1rem !important;
+    margin-top: 8px !important;
+  }
+  .footer h3 {
+    font-size: 1.13rem !important;
+  }
+  #footer {
+    padding-left: 1vw !important;
+    padding-right: 1vw !important;
+    font-size: 0.97rem !important;
+  }
+
+  /* Plotly modebar: stick to right edge, opaque, smaller icons */
+  .map-container .modebar-container {
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    left: auto !important;
+    transform: scale(1) !important;
+    opacity: 1 !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    padding: 4px !important;
+    z-index: 20 !important;
+  }
+  .map-container .modebar-group,
+  .map-container .modebar-btn {
+    margin: 0 !important;
+    padding: 1px !important;
+  }
+  .map-container .modebar-btn {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .map-container .modebar-btn > svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: #333 !important;
+    stroke: none !important;
+  }
+}
+
+
   </style>
 </head>
 <body>
   {% include 'navbar.html' %}
 
+  <main id="main">
+    <div class="max-w-5xl mx-auto page-intro px-3">
+      <div class="map-card">
+        <div class="section-title">Live Flood Risk Overview</div>
+        <div class="map-container" id="risk-map"></div>
+      </div>
 
-
-
-<main id="main">
-  <div class="container page-intro">
-    <div class="section-title" style="margin: 20px 0 20px;">FloodML – City-Level Flood Risk Dashboard</div>
-
-    <div class="map-card">
-      <div class="section-title">Live Flood Risk Overview</div>
-      <div class="map-container" id="risk-map"></div>
+      <div class="map-card">
+        <div class="section-title">Current Precipitation (3-Day Accumulated)</div>
+        <div class="map-container" id="rain-map"></div>
+      </div>
     </div>
+  </main>
 
-    <div class="map-card">
-      <div class="section-title">Current Precipitation (3-Day Accumulated)</div>
-      <div class="map-container" id="rain-map"></div>
-    </div>
-
-    
-  </div>
-</main>
-
-<!-- Footer -->
-<footer id="footer">
-  <div class="footer-top section-bg">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6">
-          <h3>FloodML</h3>
-          <p>City-level flood risk prediction powered by machine learning, weather APIs, and geospatial data.</p>
+  <!-- Footer -->
+  <footer id="footer" class="bg-white border-t mt-8">
+    <div class="py-6 bg-gray-50">
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-start gap-6 px-3">
+        <div>
+          <h3 class="text-xl font-bold mb-2">FloodML</h3>
+          <p class="text-gray-600 text-base">City-level flood risk prediction powered by machine learning, weather APIs, and geospatial data.</p>
         </div>
-        <div class="col-lg-6">
-          <div class="footer-info">
-            <strong>Email:</strong> yourname@example.com<br>
-          </div>
+        <div class="footer-info text-gray-800">
+          <div class="font-semibold">Email:</div>
+          <a href="mailto:yourname@example.com" class="hover:underline text-blue-700">yourname@example.com</a>
         </div>
       </div>
     </div>
-  </div>
-  <div class="container py-4">
-    <div class="copyright">
+    <div class="text-center py-4 text-gray-500 text-sm">
       &copy; Copyright <strong>FloodML</strong>. All Rights Reserved
     </div>
-  </div>
-</footer>
+  </footer>
 
-<!-- Scripts -->
-<script src="static/lib/jquery/jquery.min.js"></script>
-<script src="static/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="static/js/main.js"></script>
+  <script>
+    async function loadData() {
+      try {
+        const res = await fetch('/plot-data');
+        const data = await res.json();
 
-<script>
-  async function loadData() {
-    try {
-      const res = await fetch('/plot-data');
-      const data = await res.json();
+        const lats = data.map(d => d.latitude);
+        const lons = data.map(d => d.longitude);
+        const risks = data.map(d => d.risk);
+        const scores = data.map(d => d.score);
+        const rain = data.map(d => d.rain_3d);
 
-      const lats = data.map(d => d.latitude);
-      const lons = data.map(d => d.longitude);
-      const risks = data.map(d => d.risk);
-      const scores = data.map(d => d.score);
-      const rain = data.map(d => d.rain_3d);
+        const layout = {
+          mapbox: {
+            style: 'open-street-map',
+            center: { lat: 22.5, lon: 80 },
+            zoom: 4.0
+          },
+          margin: { t: 0, b: 0, l: 0, r: 0 },
+          autosize: true
+        };
 
-      const layout = {
-        mapbox: {
-          style: 'open-street-map',
-          center: { lat: 22.5, lon: 80 },
-          zoom: 4.0
-        },
-        margin: { t: 0, b: 0, l: 0, r: 0 },
-        autosize: true
-      };
+        // Adjusted size logic to prevent large circles for low-risk
+        const computeMarkerSize = score => {
+          if (score < 40) return 10;
+          if (score < 60) return 18;
+          return 25;
+        };
 
-      // Adjusted size logic to prevent large circles for low-risk
-      const computeMarkerSize = score => {
-        if (score < 40) return 10;
-        if (score < 60) return 18;
-        return 25;
-      };
+        Plotly.newPlot('risk-map', [{
+          type: 'scattermapbox',
+          lat: lats,
+          lon: lons,
+          text: data.map(d => `${d.city}<br><b>Risk:</b> ${d.risk}<br><b>Score:</b> ${d.score}`),
+          marker: {
+            size: scores.map(computeMarkerSize),
+            color: risks.map(r =>
+              r === 'High Risk' ? 'red' :
+              r === 'Moderate Risk' ? 'orange' :
+              'green'
+            ),
+            opacity: 0.8,
+            line: { width: 1, color: '#fff' }
+          }
+        }], layout);
 
-      Plotly.newPlot('risk-map', [{
-        type: 'scattermapbox',
-        lat: lats,
-        lon: lons,
-        text: data.map(d => `${d.city}<br><b>Risk:</b> ${d.risk}<br><b>Score:</b> ${d.score}`),
-        marker: {
-          size: scores.map(computeMarkerSize),
-          color: risks.map(r =>
-            r === 'High Risk' ? 'red' :
-            r === 'Moderate Risk' ? 'orange' :
-            'green'
-          ),
-          opacity: 0.8,
-          line: { width: 1, color: '#fff' }
-        }
-      }], layout);
+        Plotly.newPlot('rain-map', [{
+          type: 'scattermapbox',
+          lat: lats,
+          lon: lons,
+          text: data.map(d => `${d.city}<br><b>Rainfall:</b> ${d.rain_3d} mm`),
+          marker: {
+            size: rain.map(r => Math.max(r / 2.5, 8)),
+            color: 'blue',
+            opacity: 0.6
+          }
+        }], layout);
 
-      Plotly.newPlot('rain-map', [{
-        type: 'scattermapbox',
-        lat: lats,
-        lon: lons,
-        text: data.map(d => `${d.city}<br><b>Rainfall:</b> ${d.rain_3d} mm`),
-        marker: {
-          size: rain.map(r => Math.max(r / 2.5, 8)),
-          color: 'blue',
-          opacity: 0.6
-        }
-      }], layout);
-
-    } catch (err) {
-      console.error('Failed to load plot data:', err);
-      document.getElementById('risk-map').innerText = 'Error loading data';
+      } catch (err) {
+        console.error('Failed to load plot data:', err);
+        document.getElementById('risk-map').innerText = 'Error loading data';
+      }
     }
-  }
-
-  loadData();
-</script>
-
+    loadData();
+  </script>
 </body>
 </html>

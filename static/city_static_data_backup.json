@@ -20,6 +20,13 @@
     "latitude": 22.5726,
     "longitude": 88.3639
   },
+  "Devanahalli": {
+    "elevation": 940,
+    "drainage_index": 48.5,
+    "soil_moisture": 46.0,
+    "latitude": 13.2433,
+    "longitude": 77.7139
+  },
   "Udupi": {
     "elevation": 27,
     "drainage_index": 38.5,
