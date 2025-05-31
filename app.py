@@ -230,7 +230,7 @@ async def preview_pdf(request: Request):
 
 @app.get("/predicts.html", response_class=HTMLResponse)
 def predicts(request: Request):
-    return templates.TemplateResponse("predicts.html", {"request": request, "cities": cities, "cityname": "Information about the city"})
+    return templates.TemplateResponse("predicts.html", {"request": request, "cities": cities, "cityname": ""})
 
 @app.post("/predicts.html", response_class=HTMLResponse)
 async def get_predicts(request: Request):
@@ -265,8 +265,10 @@ async def get_predicts(request: Request):
         elevation = final[6]
         rain_elev_ratio = rain_3d / (elevation + 1)
         is_flood_prone = 1 if resolved_name in [
-            "Patna", "Mumbai", "Chennai", "Kolkata", "Guwahati", "Bhubaneswar",
-            "Visakhapatnam", "Thiruvananthapuram", "Alappuzha"
+            "Patna", "Guwahati", "Silchar", "Dibrugarh", "Kolkata",
+            "Bhubaneswar", "Chennai", "Alappuzha", "Thrissur", "Mangaluru",
+            "Mumbai", "Panaji", "Puducherry", "Vijayawada", "Visakhapatnam",
+            "Thiruvananthapuram", "Tirunelveli", "Imphal", "Dispur"
         ] else 0
 
         ml_vector = [rain_3d, temp, humidity, elevation, rain_elev_ratio, is_flood_prone]
@@ -276,9 +278,8 @@ async def get_predicts(request: Request):
         return templates.TemplateResponse("predicts.html", {
             "request": request,
             "cityname": f"Information about {resolved_name}",
-            # Always provide the city list as names for JS fuzzy search:
             "cities": cities,
-            # If you ever need selected-state logic, provide it under a different key:
+            # If ever need selected-state logic, provide it under a different key:
             # "cities_selected": cities_selected,
             "temp": round(final[5], 2),
             "percip": round(final[1], 2),
@@ -303,7 +304,6 @@ async def get_predicts(request: Request):
         return templates.TemplateResponse("predicts.html", {
             "request": request,
             "cityname": repr(e),
-            # Always provide the city list as names for JS fuzzy search:
             "cities": cities,
         })
 

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flood Risk Prediction | FloodML</title>
+  <title>Flood Risk Prediction | FRSS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
@@ -271,9 +271,9 @@
         <div class="hidden lg:block"></div>
         <!-- Right Metrics -->
         <div class="metrics-column">
-          <div class="metric-card"><div class="metric-title">Rainfall(Last 3d)</div><div class="metric-value">{{ rain_3d or '0' }}</div></div>
+          <div class="metric-card"><div class="metric-title">Rainfall(Last 3d)</div><div class="metric-value">{{ rain_3d or '--' }}</div></div>
           <div class="metric-card"><div class="metric-title">Rain Forecast (48h)</div><div class="metric-value">{{ rain_2d or '--' }}</div></div>
-          <div class="metric-card"><div class="metric-title">Rain Probability</div><div class="metric-value">{{ pop or '0' }}%</div></div>
+          <div class="metric-card"><div class="metric-title">Rain Probability</div><div class="metric-value">{{ pop or '--' }}%</div></div>
           <div class="metric-card"><div class="metric-title">Drainage Index</div><div class="metric-value">{{ drainage or '--' }}</div></div>
         </div>
       </div>
