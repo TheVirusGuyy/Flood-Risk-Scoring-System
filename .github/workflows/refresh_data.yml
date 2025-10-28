@@ -2,40 +2,45 @@ name: Refresh Flood Data
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Runs every 6 hours
-  workflow_dispatch:        # Allows manual run
+    - cron: "0 */6 * * *"      # every 6 hours (UTC)
+  workflow_dispatch:            # manual run
+
+permissions:
+  contents: write               # lets GITHUB_TOKEN push commits
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo using PAT
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.GH_PAT }}
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-    - name: Set up environment variables
-      run: |
-        echo "WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}" >> .env
-        echo "TOGETHER_API_KEY=${{ secrets.TOGETHER_API_KEY }}" >> .env
+      - name: Set up environment variables file
+        run: |
+          echo "WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}" >> .env
+          echo "TOGETHER_API_KEY=${{ secrets.TOGETHER_API_KEY }}" >> .env
 
-    - name: Run flood data generator
-      run: python generate_plotting_data.py
+      - name: Run flood data generator
+        run: python generate_plotting_data.py
 
-    - name: Commit and push updated data
-      run: |
-        git config --global user.name "flood-bot"
-        git config --global user.email "bot@example.com"
-        git add plot_data_cache.json
-        git commit -m "Auto update flood data [skip ci]" || echo "No changes"
-        git push origin master
+      - name: Commit and push updated data (if any)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add -A
+            git commit -m "chore: refresh flood data [skip ci]"
+            # Push back to the same branch this workflow runs on
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "No changes to commit."
+          fi
